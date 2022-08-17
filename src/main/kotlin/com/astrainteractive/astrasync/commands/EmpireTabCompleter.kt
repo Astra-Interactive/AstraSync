@@ -5,15 +5,14 @@ import CommandManager
 import com.astrainteractive.astralibs.AstraLibs
 import com.astrainteractive.astralibs.utils.registerTabCompleter
 import com.astrainteractive.astralibs.utils.withEntry
+import com.astrainteractive.astrasync.events.BungeeUtil
 
-/**
- * Tab completer for your plugin which is called when player typing commands
- */
-fun CommandManager.tabCompleter() = AstraLibs.registerTabCompleter("atemp") { sender, args ->
+
+fun CommandManager.tabCompleter() = AstraLibs.registerTabCompleter("syncserver") { sender, args ->
     if (args.isEmpty())
-        return@registerTabCompleter listOf("atemp", "atempreload")
+        return@registerTabCompleter BungeeUtil.servers.toList().withEntry(args.last())
     if (args.size == 1)
-        return@registerTabCompleter listOf("atemp", "atempreload").withEntry(args.last())
+        return@registerTabCompleter BungeeUtil.servers.toList().withEntry(args.last())
     return@registerTabCompleter listOf<String>()
 }
 

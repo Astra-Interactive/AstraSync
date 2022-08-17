@@ -2,6 +2,7 @@ package com.astrainteractive.astrasync.events
 
 import com.astrainteractive.astralibs.async.AsyncHelper
 import com.astrainteractive.astrasync.api.Controller
+import com.astrainteractive.astrasync.utils.Translation
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -24,13 +25,11 @@ object EventController {
     fun loadPlayer(player: Player) = AsyncHelper.launch {
         if (isPlayerLocked(player)) return@launch
         lockPlayer(player)
-        println("Loading player ${player.name}")
         val playerDomain = Controller.getPlayerInfo(player) ?: run {
+            player.kickPlayer(Translation.errorOccurredInLoading)
             unlockPlayer(player)
-            println("Loaded player ${player.name}")
             return@launch
         }
-        println("Player's domain: $playerDomain")
         AsyncHelper.callSyncMethod {
             player.inventory.contents = playerDomain.items.toTypedArray()
             player.totalExperience = playerDomain.experience
@@ -41,15 +40,17 @@ object EventController {
                 player.addPotionEffect(it)
             }
         }?.get()
-        println("Loaded player ${player.name}")
         unlockPlayer(player)
     }
 
     fun savePlayer(player: Player, clear: Boolean = false, onSaved: () -> Unit = {}) = AsyncHelper.launch {
         if (isPlayerLocked(player)) return@launch
         lockPlayer(player)
-        Controller.saveFullPlayer(player, clear)
-        AsyncHelper.callSyncMethod(onSaved)
+        Controller.saveFullPlayer(player, clear)?.let {
+            AsyncHelper.callSyncMethod(onSaved)
+        }?:run{
+            player.sendMessage(Translation.errorOccurredInSaving)
+        }
         unlockPlayer(player)
     }
 

@@ -1,5 +1,6 @@
 package com.astrainteractive.astrasync.api
 
+import com.astrainteractive.astralibs.utils.catching
 import com.astrainteractive.astrasync.api.entities.*
 import com.astrainteractive.astrasync.utils.EmpireConfig
 import org.bukkit.entity.Player
@@ -14,8 +15,8 @@ object Controller {
     private val Player.databaseName: String
         get() = name.uppercase()
 
-    fun getPlayerInfo(player: Player): DomainPlayer? {
-        return transaction {
+    fun getPlayerInfo(player: Player): DomainPlayer? = catching(true) {
+        transaction {
             val fullPlayer = FullPlayer.find(Players.minecraftName eq player.databaseName).firstOrNull()
             fullPlayer?.toDomain(player)
         }
@@ -29,9 +30,9 @@ object Controller {
         return result
     }
 
-    suspend fun saveFullPlayer(player: Player, clear: Boolean = false) {
+    suspend fun saveFullPlayer(player: Player, clear: Boolean = false) = catching(true) {
         transaction {
-            val playerID = estimate("savedPlayer: ") { savePlayer(player, clear).value }
+            savePlayer(player, clear).value
         }
     }
 

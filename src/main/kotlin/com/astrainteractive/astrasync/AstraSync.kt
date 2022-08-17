@@ -6,6 +6,7 @@ import com.astrainteractive.astralibs.Logger
 import com.astrainteractive.astralibs.events.GlobalEventManager
 import com.astrainteractive.astrasync.api.AstraDatabase
 import com.astrainteractive.astrasync.api.Controller
+import com.astrainteractive.astrasync.events.BungeeUtil
 import com.astrainteractive.astrasync.events.EventController
 import com.astrainteractive.astrasync.events.EventHandler
 import com.astrainteractive.astrasync.utils.PluginTranslation
@@ -46,11 +47,9 @@ class AstraSync : JavaPlugin() {
         AstraDatabase()
     }
     private val bungeeChannelRegister by lazy {
-        Bukkit.getServer().messenger.registerOutgoingPluginChannel(AstraLibs.instance,"bungeecord:main")
-        Bukkit.getServer().messenger.registerOutgoingPluginChannel(AstraLibs.instance,"velocity:main")
-        Bukkit.getServer().messenger.registerOutgoingPluginChannel(AstraLibs.instance,"BungeeCord")
-        Bukkit.getServer().messenger.registerOutgoingPluginChannel(AstraLibs.instance,"bungeecord:velocity")
+        Bukkit.getServer().messenger.registerOutgoingPluginChannel(AstraLibs.instance, "BungeeCord")
     }
+
     /**
      * This method called when server starts or PlugMan load plugin.
      */
@@ -60,8 +59,9 @@ class AstraSync : JavaPlugin() {
         PluginTranslation()
         _Files()
         _EmpireConfig.kotlinxSerializaion()
-        bungeeChannelRegister
         database.toString()
+        bungeeChannelRegister
+        Bukkit.getServer().messenger.registerIncomingPluginChannel(AstraLibs.instance, "BungeeCord", BungeeUtil)
         eventHandler = EventHandler()
         commandManager = CommandManager()
 
@@ -74,6 +74,7 @@ class AstraSync : JavaPlugin() {
         runBlocking { EventController.saveAllPlayers() }
         HandlerList.unregisterAll(this)
         GlobalEventManager.onDisable()
+        Bukkit.getServer().messenger.unregisterIncomingPluginChannel(AstraLibs.instance, "BungeeCord", BungeeUtil)
     }
 
     /**

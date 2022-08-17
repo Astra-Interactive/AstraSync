@@ -44,11 +44,6 @@ class PluginTranslation {
         return msg
     }
 
-    //Database
-    val dbSuccess: String =
-        getHEXString("database.success", "#18dbd1Успешно подключено к базе данных")
-    val dbFail: String = getHEXString("database.fail", "#db2c18Нет подключения к базе данных")
-
     //General
     val prefix: String = getHEXString("general.prefix", "#18dbd1[EmpireItems]")
     val reload: String = getHEXString("general.reload", "#dbbb18Перезагрузка плагина")
@@ -57,20 +52,20 @@ class PluginTranslation {
     val noPermission: String =
         getHEXString("general.no_permission", "#db2c18У вас нет прав!")
 
-    //Menu
-    val menuTitle: String = getHEXString("menu.title", "#18dbd1Меню")
-    val menuAddPlayer: String = getHEXString("menu.add_player", "#18dbd1Добавить игрока")
-    val menuFirstPage: String = getHEXString("menu.first_page", "#dbbb18Вы на первой странице")
-    val menuLastPage: String = getHEXString("menu.last_page", "#dbbb18Вы на последней странице")
-    val menuPrevPage: String = getHEXString("menu.prev_page", "#18dbd1Пред. страницы")
-    val menuNextPage: String = getHEXString("menu.next_page", "#18dbd1След. страница")
-    val menuBack: String = getHEXString("menu.back", "#18dbd1Назад")
-    val menuClose: String = getHEXString("menu.close", "#18dbd1Закрыть")
+    val pleaseWait: String =
+        getHEXString("general.please_wait", "#db2c18Пожалуйста, подождите")
+    val inventoryLossWarning: String =
+        getHEXString("general.inventory_loss_warn", "#db2c18Не отключайтесь! Это может привести к потери инвентаря!!")
+    val errorOccurredInSaving: String =
+        getHEXString("general.error_in_saving", "#db2c18Произошла ошибка при сохранении инвентаря")
+    val errorOccurredInLoading: String =
+        getHEXString("general.error_in_loading", "#db2c18Произошла ошибка при загрузке инвентаря")
+    val onJoinFormat: String =
+        getHEXString("general.on_join_format", "&7[&#0ecf41+&7] %player%")
+    val onLeaveFormat: String =
+        getHEXString("general.on_join_format", "&7[&#cf0e0e-&7] %player%")
+    val messageFormat: String =
+        getHEXString("general.message_format", "#0ecf41%player%: &7%message%")
 
-    //Custom
-    val blockPlaced: String = getHEXString("custom.block_placed", "#18dbd1Блок поставлен!")
-    val noPlayerName: String = getHEXString("custom.no_player_name", "#db2c18Вы не ввели имя игрока!")
-    val damaged: String = getHEXString("custom.damaged", "#db2c18Вас продамажил игрок %player%!")
-    val damageHint: String = getHEXString("custom.damage_hint", "<amount>")
 
 }

@@ -4,6 +4,7 @@ import CommandManager
 import com.astrainteractive.astralibs.AstraLibs
 import com.astrainteractive.astralibs.commands.AstraDSLCommand
 import com.astrainteractive.astrasync.AstraSync
+import com.astrainteractive.astrasync.events.BungeeUtil
 import com.astrainteractive.astrasync.events.EventController
 import com.astrainteractive.astrasync.utils.Translation
 import com.google.common.io.ByteStreams
@@ -27,7 +28,8 @@ fun CommandManager.reload() = AstraDSLCommand.command("atempreload") {
 
 
 fun CommandManager.syncServer() = AstraDSLCommand.command("syncserver") {
-    sender.sendMessage("Ожидайте...")
+    sender.sendMessage(Translation.pleaseWait)
+    sender.sendMessage(Translation.inventoryLossWarning)
     val player = sender as? Player
     player ?: run {
         return@command
@@ -37,11 +39,7 @@ fun CommandManager.syncServer() = AstraDSLCommand.command("syncserver") {
     }
 
     EventController.savePlayer(player) {
-        val out = ByteStreams.newDataOutput()
-        out.writeUTF("Connect")
-        out.writeUTF("$server")
-        val exactPlayer = Bukkit.getPlayerExact(player.name)
-        exactPlayer!!.sendPluginMessage(AstraLibs.instance, "BungeeCord", out.toByteArray())
+        BungeeUtil.sendBungeeMessage(player, "BungeeCord", "Connect", server)
     }
 }
 
