@@ -1,15 +1,10 @@
 package com.astrainteractive.astrasync.api.entities
 
-import com.astrainteractive.astrasync.api.Serializer
-import com.astrainteractive.astrasync.api.databaseName
-import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 
 /**
  * Игрок
@@ -20,6 +15,9 @@ object Players : IntIdTable() {
     val health: Column<Double> = double("health")
     val foodLevel: Column<Int> = integer("foodLevel")
     val lastServerName: Column<String> = varchar("last_server_name", 32)
+    val items:Column<String> = text("items")
+    val enderChestItems:Column<String> = text("ender_chest")
+    val effects:Column<String> = text("effects")
 }
 
 class DBPlayer(id: EntityID<Int>) : Entity<Int>(id) {
@@ -29,5 +27,8 @@ class DBPlayer(id: EntityID<Int>) : Entity<Int>(id) {
     var health by Players.health
     var foodLevel by Players.foodLevel
     var lastServerName by Players.lastServerName
+    var items by Players.items
+    var enderChestItems by Players.enderChestItems
+    var effects by Players.effects
 }
 

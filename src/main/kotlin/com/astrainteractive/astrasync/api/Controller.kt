@@ -3,10 +3,10 @@ package com.astrainteractive.astrasync.api
 import com.astrainteractive.astrasync.api.entities.*
 import com.astrainteractive.astrasync.utils.EmpireConfig
 import org.bukkit.entity.Player
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.transaction
 
 
@@ -21,50 +21,33 @@ object Controller {
         }
     }
 
+    fun <T> estimate(msg: String, block: () -> T): T {
+        val started = System.currentTimeMillis()
+        val result = block()
+        val time = System.currentTimeMillis() - started
+        println(msg + "${time / 1000.0}")
+        return result
+    }
+
     suspend fun saveFullPlayer(player: Player) {
-        val playerID = savePlayer(player).value
         transaction {
-            InventoryItems.deleteWhere { InventoryItems.playerID eq playerID }
-            EnderChestInventoryItems.deleteWhere { EnderChestInventoryItems.playerID eq playerID }
-        }
-        transaction {
-            saveInventory(player, playerID)
-            saveEnderInventory(player, playerID)
-            saveEffects(player, playerID)
+            val playerID = estimate("savedPlayer: ") { savePlayer(player).value }
         }
     }
 
-    private fun savePlayer(player: Player) = transaction {
-        val playerID = DBPlayer.find(Players.minecraftName eq player.databaseName).firstOrNull()?.id
+    private fun savePlayer(player: Player): EntityID<Int> {
         val block: DBPlayer.() -> Unit = {
             this.minecraftName = player.databaseName
             this.experience = player.totalExperience
             this.lastServerName = EmpireConfig.serverID
             this.health = player.health
             this.foodLevel = player.foodLevel
+            this.items = Serializer.toBase64(player.inventory.contents.toList())
+            this.enderChestItems = Serializer.toBase64(player.enderChest.contents.toList())
+            this.effects = Serializer.toBase64(player.activePotionEffects.filterNotNull())
         }
-        playerID?.let(DBPlayer::findById)?.apply(block)?.id ?: DBPlayer.new(block).id
-    }
-
-    private fun saveInventory(player: Player, playerID: Int) {
-        InventoryItems.batchInsert(player.inventory.contents?.toList() ?: emptyList()) {
-            this[InventoryItems.playerID] = playerID
-            this[InventoryItems.item] = ExposedBlob(Serializer.serializeItem(it))
-        }
-    }
-
-    private fun saveEnderInventory(player: Player, playerID: Int) {
-        InventoryItems.batchInsert(player.enderChest.contents?.toList() ?: emptyList()) {
-            this[InventoryItems.playerID] = playerID
-            this[InventoryItems.item] = ExposedBlob(Serializer.serializeItem(it))
-        }
-    }
-
-    private fun saveEffects(player: Player, playerID: Int) {
-        PotionEffects.batchInsert(player.activePotionEffects.filterNotNull()) {
-            this[InventoryItems.playerID] = playerID
-            this[PotionEffects.potionEffect] = ExposedBlob(Serializer.serializeItem(it))
-        }
+        return DBPlayer.find(Players.minecraftName eq player.databaseName).firstOrNull()?.apply(block)?.id
+            ?: DBPlayer.new(block).id
     }
 }
 

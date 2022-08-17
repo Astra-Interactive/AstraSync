@@ -17,6 +17,7 @@ class CommandManager {
     init {
         tabCompleter()
         reload()
+        syncServer()
     }
 
 

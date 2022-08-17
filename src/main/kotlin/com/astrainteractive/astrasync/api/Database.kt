@@ -1,9 +1,7 @@
 package com.astrainteractive.astrasync.api
 
 import com.astrainteractive.astralibs.Logger
-import com.astrainteractive.astrasync.api.entities.InventoryItems
-import com.astrainteractive.astrasync.api.entities.Players
-import com.astrainteractive.astrasync.api.entities.PotionEffects
+import com.astrainteractive.astrasync.api.entities.*
 import com.astrainteractive.astrasync.utils.EmpireConfig
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -36,9 +34,11 @@ class AstraDatabase {
         Database.registerDialect("mariadb") { MariaDBDialect() }
         Database.registerDialect("mysql") { MysqlDialect() }
         transaction {
-            SchemaUtils.create(Players)
-            SchemaUtils.create(InventoryItems)
-            SchemaUtils.create(PotionEffects)
+            val tables = buildList {
+                add(Players)
+            }
+            tables.forEach(SchemaUtils::create)
+            tables.forEach(SchemaUtils::createMissingTablesAndColumns)
         }
     }
 }

@@ -56,6 +56,10 @@ repositories {
     maven("https://maven.playpro.com")
     maven("https://jitpack.io")
     maven {
+        name = "papermc"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
+    maven {
         url = uri("https://mvn.lumine.io/repository/maven-public/")
         metadataSources {
             artifact()
@@ -100,6 +104,9 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:${Spigot.vault}")
     compileOnly("net.coreprotect:coreprotect:${Spigot.coreProtect}")
     compileOnly("com.ticxo.modelengine:api:${Spigot.modelEngine}")
+
+    compileOnly("com.velocitypowered:velocity-api:3.1.1")
+    annotationProcessor("com.velocitypowered:velocity-api:3.1.1")
 //    implementation("org.xerial:sqlite-jdbc:3.23.1")
 }
 
@@ -159,9 +166,17 @@ tasks.shadowJar {
     archiveClassifier.set(null as String?)
     from(sourceSets.main.get().output)
     from(project.configurations.runtimeClasspath)
-    minimize{
+    minimize {
         exclude(dependency("org.jetbrains.exposed:exposed-jdbc:${Kotlin.exposed}"))
         exclude(dependency("org.jetbrains.exposed:exposed-dao:${Kotlin.exposed}"))
     }
     destinationDirectory.set(File("D:\\Minecraft Servers\\FarmWorld\\farm\\plugins"))
+
+    doLast {
+        copy {
+            from("D:\\Minecraft Servers\\FarmWorld\\farm\\plugins")
+            into("D:\\Minecraft Servers\\FarmWorld\\main\\plugins")
+        }
+    }
 }
+

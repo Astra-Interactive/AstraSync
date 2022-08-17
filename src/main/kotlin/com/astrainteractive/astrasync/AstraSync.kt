@@ -45,7 +45,12 @@ class AstraSync : JavaPlugin() {
     private val database by lazy {
         AstraDatabase()
     }
-
+    private val bungeeChannelRegister by lazy {
+        Bukkit.getServer().messenger.registerOutgoingPluginChannel(AstraLibs.instance,"bungeecord:main")
+        Bukkit.getServer().messenger.registerOutgoingPluginChannel(AstraLibs.instance,"velocity:main")
+        Bukkit.getServer().messenger.registerOutgoingPluginChannel(AstraLibs.instance,"BungeeCord")
+        Bukkit.getServer().messenger.registerOutgoingPluginChannel(AstraLibs.instance,"bungeecord:velocity")
+    }
     /**
      * This method called when server starts or PlugMan load plugin.
      */
@@ -55,6 +60,7 @@ class AstraSync : JavaPlugin() {
         PluginTranslation()
         _Files()
         _EmpireConfig.kotlinxSerializaion()
+        bungeeChannelRegister
         database.toString()
         eventHandler = EventHandler()
         commandManager = CommandManager()

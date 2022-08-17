@@ -13,7 +13,8 @@ class FullPlayer(id: EntityID<Int>) : Entity<Int>(id) {
     var lastServerName by Players.lastServerName
     var foodLevel by Players.foodLevel
     var health by Players.health
-    val items by InventoryItem referrersOn InventoryItems.playerID
-    val enderChestItems by EnderChestInventoryItem referrersOn EnderChestInventoryItems.playerID
-    val potionEffect by PotionEffect referrersOn PotionEffects.playerID
+
+    var items by Players.items
+    var potionEffects by Players.effects
+    var enderChestItems by Players.enderChestItems
 }

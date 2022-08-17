@@ -4,7 +4,6 @@ import com.astrainteractive.astralibs.async.AsyncHelper
 import com.astrainteractive.astrasync.api.Controller
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -12,42 +11,54 @@ import java.util.*
 import kotlin.collections.HashSet
 
 object EventController {
-    private val unInitializedPlayer = HashSet<UUID>()
+    private val lockedPlayers = HashSet<UUID>()
 
     @Synchronized
-    fun rememberInitializedPlayer(player: Player) = unInitializedPlayer.add(player.uniqueId)
+    fun lockPlayer(player: Player) = lockedPlayers.add(player.uniqueId)
 
     @Synchronized
-    fun setPlayerInitialized(player: Player) = unInitializedPlayer.remove(player.uniqueId)
+    fun unlockPlayer(player: Player) = lockedPlayers.remove(player.uniqueId)
 
     @Synchronized
-    fun isPlayerInitialized(player: Player?) = unInitializedPlayer.contains(player?.uniqueId)
-    fun loadPlayer(player: Player) {
-        rememberInitializedPlayer(player)
-        val playerDomain = Controller.getPlayerInfo(player) ?: return
-        player.inventory.contents = playerDomain.items.toTypedArray()
-        player.totalExperience = playerDomain.experience
-        player.health = playerDomain.health
-        player.foodLevel = playerDomain.foodLevel
-        player.enderChest.contents = playerDomain.enderChestItems.toTypedArray()
-        playerDomain.potionEffect.forEach {
-            player.addPotionEffect(it)
+    fun isPlayerLocked(player: Player?) = lockedPlayers.contains(player?.uniqueId)
+    fun loadPlayer(player: Player) = AsyncHelper.launch {
+        if (isPlayerLocked(player)) return@launch
+        lockPlayer(player)
+        println("Loading player ${player.name}")
+        val playerDomain = Controller.getPlayerInfo(player) ?: run {
+            unlockPlayer(player)
+            println("Loaded player ${player.name}")
+            return@launch
         }
-        setPlayerInitialized(player)
+        println("Player's domain: $playerDomain")
+        AsyncHelper.callSyncMethod {
+            player.inventory.contents = playerDomain.items.toTypedArray()
+            player.totalExperience = playerDomain.experience
+            player.health = playerDomain.health
+            player.foodLevel = playerDomain.foodLevel
+            player.enderChest.contents = playerDomain.enderChestItems.toTypedArray()
+            playerDomain.potionEffect.forEach {
+                player.addPotionEffect(it)
+            }
+        }?.get()
+        println("Loaded player ${player.name}")
+        unlockPlayer(player)
     }
 
-    fun onPlayerLeave(player: Player) {
-        if (!isPlayerInitialized(player)) return
-        AsyncHelper.launch {
-            Controller.saveFullPlayer(player)
-            setPlayerInitialized(player)
-        }
+    fun savePlayer(player: Player,onSaved:()->Unit={}) = AsyncHelper.launch {
+        if (isPlayerLocked(player)) return@launch
+        lockPlayer(player)
+        println("Saving player ${player.name}")
+        Controller.saveFullPlayer(player)
+        println("Saved player ${player.name}")
+        AsyncHelper.callSyncMethod(onSaved)
+        unlockPlayer(player)
     }
 
-    suspend fun saveAllPlayers() = coroutineScope {
-        Bukkit.getOnlinePlayers().filter { isPlayerInitialized(it) }.map {
+    fun saveAllPlayers() = AsyncHelper.launch {
+        Bukkit.getOnlinePlayers().map {
             async {
-                Controller.saveFullPlayer(it)
+                savePlayer(it)
             }
         }.awaitAll()
     }

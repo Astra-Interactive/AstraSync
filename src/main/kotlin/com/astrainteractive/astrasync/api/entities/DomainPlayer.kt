@@ -9,8 +9,8 @@ class DomainPlayer(
     val player: Player,
     val experience: Int,
     val lastServerName: String,
-    val foodLevel:Int,
-    val health:Double,
+    val foodLevel: Int,
+    val health: Double,
     val items: List<ItemStack>,
     val enderChestItems: List<ItemStack>,
     val potionEffect: List<org.bukkit.potion.PotionEffect>,
@@ -23,8 +23,8 @@ fun FullPlayer.toDomain(player: Player): DomainPlayer {
         lastServerName = lastServerName,
         foodLevel = foodLevel,
         health = health,
-        items = items.mapNotNull { Serializer.deserializeItem(it.item.bytes) },
-        enderChestItems = enderChestItems.mapNotNull { Serializer.deserializeItem(it.item.bytes) },
-        potionEffect = potionEffect.mapNotNull { Serializer.deserializeItem(it.potionEffect.bytes) }
+        items = Serializer.fromBase64(items) ?: emptyList(),
+        enderChestItems = Serializer.fromBase64(enderChestItems) ?: emptyList(),
+        potionEffect = Serializer.fromBase64(potionEffects) ?: emptyList()
     )
 }
