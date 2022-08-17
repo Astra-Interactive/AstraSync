@@ -21,7 +21,7 @@ object Spigot {
 }
 
 group = "com.astrainteractive"
-version = "0.0.1-aplha"
+version = "0.1.0-beta"
 val name = "AstraSync"
 description = "Allow players to syn inventories between servers"
 
