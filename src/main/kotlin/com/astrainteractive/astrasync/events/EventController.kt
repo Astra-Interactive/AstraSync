@@ -2,6 +2,7 @@ package com.astrainteractive.astrasync.events
 
 import com.astrainteractive.astralibs.FileManager
 import com.astrainteractive.astralibs.async.AsyncHelper
+import com.astrainteractive.astralibs.utils.catching
 import com.astrainteractive.astrasync.api.Controller
 import com.astrainteractive.astrasync.api.Controller.databaseName
 import com.astrainteractive.astrasync.api.entities.DomainPlayer
@@ -26,6 +27,7 @@ object EventController {
     @Synchronized
     fun isPlayerLocked(player: Player?) = lockedPlayers.contains(player?.uniqueId)
     fun loadPlayer(player: Player) = AsyncHelper.launch {
+        AsyncHelper.launch { EventController.savePlayerToTemp(player, false) }
         if (isPlayerLocked(player)) return@launch
         lockPlayer(player)
         val playerDomain = Controller.getPlayerInfo(player) ?: run {
@@ -36,19 +38,22 @@ object EventController {
             return@launch
         }
         AsyncHelper.callSyncMethod {
-            player.inventory.contents = playerDomain.items.toTypedArray()
-            player.totalExperience = playerDomain.experience
-            player.health = playerDomain.health
-            player.foodLevel = playerDomain.foodLevel
-            player.enderChest.contents = playerDomain.enderChestItems.toTypedArray()
-            playerDomain.potionEffect.forEach {
-                player.addPotionEffect(it)
+            catching(true) { player.inventory.contents = playerDomain.items.toTypedArray() }
+            catching { player.totalExperience = playerDomain.experience }
+            catching { player.health = playerDomain.health }
+            catching { player.foodLevel = playerDomain.foodLevel }
+            catching(true) { player.enderChest.contents = playerDomain.enderChestItems.toTypedArray() }
+            catching(true) {
+                playerDomain.potionEffect.forEach {
+                    player.addPotionEffect(it)
+                }
             }
         }?.get()
         unlockPlayer(player)
     }
 
     fun savePlayer(player: Player, clear: Boolean = false, onSaved: () -> Unit = {}) = AsyncHelper.launch {
+        AsyncHelper.launch { EventController.savePlayerToTemp(player,true) }
         if (isPlayerLocked(player)) return@launch
         lockPlayer(player)
         Controller.saveFullPlayer(player, clear)?.let {

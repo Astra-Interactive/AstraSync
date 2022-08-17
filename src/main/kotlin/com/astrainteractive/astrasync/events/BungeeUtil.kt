@@ -15,13 +15,16 @@ object BungeeUtil : PluginMessageListener {
     var servers: HashSet<String> = HashSet()
     var currentServer: String? = null
         private set
-    fun requestServersUpdate(){
+
+    fun requestServersUpdate() {
         BungeeUtil.sendBungeeMessage("BungeeCord", "GetServers")
 
     }
-    fun requestServerUpdate(){
+
+    fun requestServerUpdate() {
         BungeeUtil.sendBungeeMessage("BungeeCord", "GetServer")
     }
+
     fun rememberServers(list: List<String>?) {
 
         servers.addAll(list?.joinToString("")?.split(", ") ?: emptyList())
@@ -35,12 +38,12 @@ object BungeeUtil : PluginMessageListener {
         serversAndPlayers[server] = mutableSetOf<String>().apply { addAll(players) }
     }
 
-    fun broadcast(message: String) {
-        serversAndPlayers.forEach { server, players ->
-            if (server != currentServer)
-                players.forEach {
-                    sendBungeeMessage("BungeeCord", "Message $it", message)
-                }
+    fun broadcast(message: String, sender: Player? = null) {
+        val players = serversAndPlayers.filter { it.key != currentServer }.flatMap { it.value }.toSet()
+        players.forEach {
+            Logger.warn("Broadcasting $message to $it")
+            sender?.let { p -> sendBungeeMessage(p, "BungeeCord", "Message $it", message) }
+                ?: sendBungeeMessage("BungeeCord", "Message $it", message)
         }
     }
 
@@ -83,7 +86,7 @@ object BungeeUtil : PluginMessageListener {
     override fun onPluginMessageReceived(channel: String, player: Player, message: ByteArray) {
         if (channel != "BungeeCord") return
         val bungeeMessage = decodeBungeeMessage(message)
-        Logger.log("onPluginMessageReceived: ${decodeBungeeMessage(message)}", consolePrint = false)
+        Logger.log("onPluginMessageReceived: ${decodeBungeeMessage(message)}", consolePrint = true)
         when (bungeeMessage.action) {
             "GetServers" -> {
                 rememberServers(bungeeMessage.message)
