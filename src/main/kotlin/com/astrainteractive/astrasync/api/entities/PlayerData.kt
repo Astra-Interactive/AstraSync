@@ -20,6 +20,16 @@ class InventoryItem(id: EntityID<Int>) : Entity<Int>(id) {
     var playerID by InventoryItems.playerID
     var item by InventoryItems.item
 }
+object EnderChestInventoryItems : IntIdTable() {
+    val playerID = reference("player_id", Players)
+    val item: Column<ExposedBlob> = blob("item_stack")
+}
+
+class EnderChestInventoryItem(id: EntityID<Int>) : Entity<Int>(id) {
+    companion object : EntityClass<Int, EnderChestInventoryItem>(EnderChestInventoryItems)
+    var playerID by EnderChestInventoryItems.playerID
+    var item by EnderChestInventoryItems.item
+}
 
 /**
  * Эффекты

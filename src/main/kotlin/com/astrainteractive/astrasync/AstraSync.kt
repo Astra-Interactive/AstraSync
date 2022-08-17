@@ -5,7 +5,8 @@ import com.astrainteractive.astralibs.AstraLibs
 import com.astrainteractive.astralibs.Logger
 import com.astrainteractive.astralibs.events.GlobalEventManager
 import com.astrainteractive.astrasync.api.AstraDatabase
-import com.astrainteractive.astrasync.api.Repository
+import com.astrainteractive.astrasync.api.Controller
+import com.astrainteractive.astrasync.events.EventController
 import com.astrainteractive.astrasync.events.EventHandler
 import com.astrainteractive.astrasync.utils.PluginTranslation
 import com.astrainteractive.astrasync.utils._EmpireConfig
@@ -64,13 +65,7 @@ class AstraSync : JavaPlugin() {
      * This method called when server is shutting down or when PlugMan disable plugin.
      */
     override fun onDisable() {
-        runBlocking {
-            Bukkit.getOnlinePlayers().map {
-                async {
-                    Repository.savePlayerInfo(it)
-                }
-            }.awaitAll()
-        }
+        runBlocking { EventController.saveAllPlayers() }
         HandlerList.unregisterAll(this)
         GlobalEventManager.onDisable()
     }
