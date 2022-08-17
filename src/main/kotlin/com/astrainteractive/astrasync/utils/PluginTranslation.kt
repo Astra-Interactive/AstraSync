@@ -66,6 +66,8 @@ class PluginTranslation {
         getHEXString("general.on_join_format", "&7[&#cf0e0e-&7] %player%")
     val messageFormat: String =
         getHEXString("general.message_format", "#0ecf41%player%: &7%message%")
+    val fromDiscordMessageFormat: String =
+        getHEXString("general.message_from_discord_format", "#0ecf41%player%: &7%message%")
 
 
 }

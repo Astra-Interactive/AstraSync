@@ -7,6 +7,7 @@ import com.astrainteractive.astralibs.events.GlobalEventManager
 import com.astrainteractive.astrasync.api.AstraDatabase
 import com.astrainteractive.astrasync.api.Controller
 import com.astrainteractive.astrasync.events.BungeeUtil
+import com.astrainteractive.astrasync.events.DiscordListener
 import com.astrainteractive.astrasync.events.EventController
 import com.astrainteractive.astrasync.events.EventHandler
 import com.astrainteractive.astrasync.utils.PluginTranslation
@@ -35,6 +36,7 @@ class AstraSync : JavaPlugin() {
      * Class for handling all of your events
      */
     private lateinit var eventHandler: EventHandler
+    private var discordListener:DiscordListener?=null
 
     /**
      * Command manager for your commands.
@@ -64,6 +66,9 @@ class AstraSync : JavaPlugin() {
         Bukkit.getServer().messenger.registerIncomingPluginChannel(AstraLibs.instance, "BungeeCord", BungeeUtil)
         eventHandler = EventHandler()
         commandManager = CommandManager()
+        Bukkit.getPluginManager().getPlugin("DiscordSRV")?.let {
+            discordListener = DiscordListener().apply { onEnable() }
+        }
 
     }
 
@@ -75,6 +80,7 @@ class AstraSync : JavaPlugin() {
         HandlerList.unregisterAll(this)
         GlobalEventManager.onDisable()
         Bukkit.getServer().messenger.unregisterIncomingPluginChannel(AstraLibs.instance, "BungeeCord", BungeeUtil)
+        discordListener?.onDisable()
     }
 
     /**

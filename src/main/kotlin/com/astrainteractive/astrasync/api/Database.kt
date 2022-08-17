@@ -33,6 +33,7 @@ class AstraDatabase {
         Logger.log("password: $password login: $login driver: $driver")
         Database.registerDialect("mariadb") { MariaDBDialect() }
         Database.registerDialect("mysql") { MysqlDialect() }
+
         transaction {
             val tables = buildList {
                 add(Players)

@@ -39,7 +39,7 @@ fun CommandManager.syncServer() = AstraDSLCommand.command("syncserver") {
     }
 
     EventController.savePlayer(player) {
-        BungeeUtil.sendBungeeMessage(player, "BungeeCord", "Connect", server)
+        BungeeUtil.sendBungeeMessage( "BungeeCord", "Connect", server,player)
     }
 }
 
