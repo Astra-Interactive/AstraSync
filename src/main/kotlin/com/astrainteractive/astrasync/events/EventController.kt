@@ -29,6 +29,7 @@ object EventController {
         player.totalExperience = playerDomain.experience
         player.health = playerDomain.health
         player.foodLevel = playerDomain.foodLevel
+        player.enderChest.contents = playerDomain.enderChestItems.toTypedArray()
         playerDomain.potionEffect.forEach {
             player.addPotionEffect(it)
         }
