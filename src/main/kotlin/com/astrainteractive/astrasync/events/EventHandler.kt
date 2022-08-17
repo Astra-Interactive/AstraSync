@@ -53,9 +53,9 @@ class EventHandler {
         e.isCancelled = EventController.isPlayerLocked(e.whoClicked as? Player)
     }
     val onPlayerDeath = DSLEvent.event(PlayerDeathEvent::class.java) { e ->
-        if (!EventController.isPlayerLocked(e.player)) {
+        if (EventController.isPlayerLocked(e.player)) {
             e.isCancelled = true
             e.drops.clear()
-        }
+        } else EventController.savePlayer(e.player, true)
     }
 }

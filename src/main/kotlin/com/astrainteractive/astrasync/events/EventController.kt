@@ -45,13 +45,18 @@ object EventController {
         unlockPlayer(player)
     }
 
-    fun savePlayer(player: Player,onSaved:()->Unit={}) = AsyncHelper.launch {
+    fun savePlayer(player: Player, clear: Boolean = false, onSaved: () -> Unit = {}) = AsyncHelper.launch {
         if (isPlayerLocked(player)) return@launch
         lockPlayer(player)
-        println("Saving player ${player.name}")
-        Controller.saveFullPlayer(player)
-        println("Saved player ${player.name}")
+        Controller.saveFullPlayer(player, clear)
         AsyncHelper.callSyncMethod(onSaved)
+        unlockPlayer(player)
+    }
+
+    fun clearPlayer(player: Player) = AsyncHelper.launch {
+        if (isPlayerLocked(player)) return@launch
+        lockPlayer(player)
+        Controller.saveFullPlayer(player)
         unlockPlayer(player)
     }
 

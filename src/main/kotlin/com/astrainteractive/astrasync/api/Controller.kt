@@ -29,22 +29,22 @@ object Controller {
         return result
     }
 
-    suspend fun saveFullPlayer(player: Player) {
+    suspend fun saveFullPlayer(player: Player, clear: Boolean = false) {
         transaction {
-            val playerID = estimate("savedPlayer: ") { savePlayer(player).value }
+            val playerID = estimate("savedPlayer: ") { savePlayer(player, clear).value }
         }
     }
 
-    private fun savePlayer(player: Player): EntityID<Int> {
+    private fun savePlayer(player: Player, clear: Boolean = false): EntityID<Int> {
         val block: DBPlayer.() -> Unit = {
             this.minecraftName = player.databaseName
             this.experience = player.totalExperience
             this.lastServerName = EmpireConfig.serverID
             this.health = player.health
             this.foodLevel = player.foodLevel
-            this.items = Serializer.toBase64(player.inventory.contents.toList())
-            this.enderChestItems = Serializer.toBase64(player.enderChest.contents.toList())
-            this.effects = Serializer.toBase64(player.activePotionEffects.filterNotNull())
+            this.items = Serializer.toBase64(if (clear) emptyList() else player.inventory.contents.toList())
+            this.enderChestItems = Serializer.toBase64(if (clear) emptyList() else player.enderChest.contents.toList())
+            this.effects = Serializer.toBase64(if (clear) emptyList() else player.activePotionEffects.filterNotNull())
         }
         return DBPlayer.find(Players.minecraftName eq player.databaseName).firstOrNull()?.apply(block)?.id
             ?: DBPlayer.new(block).id
