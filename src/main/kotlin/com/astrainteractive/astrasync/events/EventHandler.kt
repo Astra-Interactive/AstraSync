@@ -27,6 +27,7 @@ class EventHandler {
     val onPlayerJoin = DSLEvent.event(PlayerJoinEvent::class.java) { e ->
         EventController.loadPlayer(e.player)
         BungeeUtil.requestServersUpdate()
+        AsyncHelper.launch { EventController.savePlayerToTemp(e.player,true) }
         AsyncHelper.launch { BungeeUtil.broadcast(Translation.onJoinFormat.replace("%player%",e.player.name)) }
     }
     val worldSaveEvent = DSLEvent.event(WorldSaveEvent::class.java) { e ->
@@ -36,6 +37,7 @@ class EventHandler {
     val onPlayerLeave = DSLEvent.event(PlayerQuitEvent::class.java) { e ->
         EventController.savePlayer(e.player)
         BungeeUtil.requestServersUpdate()
+        AsyncHelper.launch { EventController.savePlayerToTemp(e.player,false) }
         AsyncHelper.launch { BungeeUtil.broadcast(Translation.onLeaveFormat.replace("%player%",e.player.name)) }
     }
     val onMove = DSLEvent.event(PlayerMoveEvent::class.java) { e ->

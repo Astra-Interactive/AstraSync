@@ -12,13 +12,13 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 
 object Controller {
-    private val Player.databaseName: String
+    val Player.databaseName: String
         get() = name.uppercase()
 
     fun getPlayerInfo(player: Player): DomainPlayer? = catching(true) {
         transaction {
             val fullPlayer = FullPlayer.find(Players.minecraftName eq player.databaseName).firstOrNull()
-            fullPlayer?.toDomain(player)
+            fullPlayer?.toDomain(player)?:DomainPlayer.fromPlayer(player)
         }
     }
 
@@ -43,8 +43,8 @@ object Controller {
             this.lastServerName = EmpireConfig.serverID
             this.health = player.health
             this.foodLevel = player.foodLevel
-            this.items = Serializer.toBase64(if (clear) emptyList() else player.inventory.contents.toList())
-            this.enderChestItems = Serializer.toBase64(if (clear) emptyList() else player.enderChest.contents.toList())
+            this.items = Serializer.toBase64(if (clear) emptyList() else player.inventory.contents?.toList()?: emptyList())
+            this.enderChestItems = Serializer.toBase64(if (clear) emptyList() else player.enderChest.contents?.toList()?: emptyList())
             this.effects = Serializer.toBase64(if (clear) emptyList() else player.activePotionEffects.filterNotNull())
         }
         return DBPlayer.find(Players.minecraftName eq player.databaseName).firstOrNull()?.apply(block)?.id

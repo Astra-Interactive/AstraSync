@@ -1,7 +1,10 @@
 package com.astrainteractive.astrasync.events
 
+import com.astrainteractive.astralibs.FileManager
 import com.astrainteractive.astralibs.async.AsyncHelper
 import com.astrainteractive.astrasync.api.Controller
+import com.astrainteractive.astrasync.api.Controller.databaseName
+import com.astrainteractive.astrasync.api.entities.DomainPlayer
 import com.astrainteractive.astrasync.utils.Translation
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -26,8 +29,10 @@ object EventController {
         if (isPlayerLocked(player)) return@launch
         lockPlayer(player)
         val playerDomain = Controller.getPlayerInfo(player) ?: run {
-            player.kickPlayer(Translation.errorOccurredInLoading)
-            unlockPlayer(player)
+            AsyncHelper.callSyncMethod {
+                player.kickPlayer(Translation.errorOccurredInLoading)
+                unlockPlayer(player)
+            }
             return@launch
         }
         AsyncHelper.callSyncMethod {
@@ -48,7 +53,7 @@ object EventController {
         lockPlayer(player)
         Controller.saveFullPlayer(player, clear)?.let {
             AsyncHelper.callSyncMethod(onSaved)
-        }?:run{
+        } ?: run {
             player.sendMessage(Translation.errorOccurredInSaving)
         }
         unlockPlayer(player)
@@ -67,6 +72,18 @@ object EventController {
                 savePlayer(it)
             }
         }.awaitAll()
+    }
+
+    fun savePlayerToTemp(player: Player, onLogin: Boolean) {
+        val prefix = if (onLogin) "login" else "exit"
+        val name = "temp/${prefix}_${player.databaseName}_${System.currentTimeMillis()}.yml"
+        val fileManager = FileManager(name)
+        val config = fileManager.getConfig()
+        DomainPlayer.fromPlayer(player).also {
+            config.set("player.items", it.items)
+            config.set("player.enderchest", it.enderChestItems)
+        }
+        fileManager.saveConfig()
     }
 
 }
