@@ -1,7 +1,7 @@
 package com.astrainteractive.astrasync.api
 
 import com.astrainteractive.astralibs.Logger
-import com.astrainteractive.astrasync.api.entities.*
+import com.astrainteractive.astrasync.api.entities.Players
 import com.astrainteractive.astrasync.utils.EmpireConfig
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils

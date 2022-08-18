@@ -170,12 +170,14 @@ tasks.shadowJar {
         exclude(dependency("org.jetbrains.exposed:exposed-jdbc:${Kotlin.exposed}"))
         exclude(dependency("org.jetbrains.exposed:exposed-dao:${Kotlin.exposed}"))
     }
-    destinationDirectory.set(File("D:\\Minecraft Servers\\FarmWorld\\farm\\plugins"))
+    destinationDirectory.set(File("D:\\Minecraft Servers\\FarmWorld\\main\\plugins"))
 
     doLast {
         copy {
-            from("D:\\Minecraft Servers\\FarmWorld\\farm\\plugins")
-            into("D:\\Minecraft Servers\\FarmWorld\\main\\plugins")
+            from("D:\\Minecraft Servers\\FarmWorld\\main\\plugins"){
+                exclude("DiscordSRV-Build-1.25.1.jar")
+            }
+            into("D:\\Minecraft Servers\\FarmWorld\\farm\\plugins")
         }
     }
 }

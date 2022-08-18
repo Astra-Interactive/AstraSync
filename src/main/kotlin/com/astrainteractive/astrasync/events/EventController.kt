@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.*
-import kotlin.collections.HashSet
 
 object EventController {
     private val lockedPlayers = HashSet<UUID>()
@@ -27,7 +26,7 @@ object EventController {
     @Synchronized
     fun isPlayerLocked(player: Player?) = lockedPlayers.contains(player?.uniqueId)
     fun loadPlayer(player: Player) = AsyncHelper.launch {
-        AsyncHelper.launch { EventController.savePlayerToTemp(player, false) }
+        AsyncHelper.launch { savePlayerToTemp(player, false) }
         if (isPlayerLocked(player)) return@launch
         lockPlayer(player)
         val playerDomain = Controller.getPlayerInfo(player) ?: run {
@@ -53,7 +52,7 @@ object EventController {
     }
 
     fun savePlayer(player: Player, clear: Boolean = false, onSaved: () -> Unit = {}) = AsyncHelper.launch {
-        AsyncHelper.launch { EventController.savePlayerToTemp(player,true) }
+        AsyncHelper.launch { savePlayerToTemp(player,true) }
         if (isPlayerLocked(player)) return@launch
         lockPlayer(player)
         Controller.saveFullPlayer(player, clear)?.let {
@@ -81,7 +80,7 @@ object EventController {
 
     fun savePlayerToTemp(player: Player, onLogin: Boolean) {
         val prefix = if (onLogin) "login" else "exit"
-        val name = "temp/${prefix}_${player.databaseName}_${System.currentTimeMillis()}.yml"
+        val name = "temp/${player.databaseName}/${prefix}_${System.currentTimeMillis()}.yml"
         val fileManager = FileManager(name)
         val config = fileManager.getConfig()
         DomainPlayer.fromPlayer(player).also {

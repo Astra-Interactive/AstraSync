@@ -5,16 +5,14 @@ import com.astrainteractive.astralibs.AstraLibs
 import com.astrainteractive.astralibs.Logger
 import com.astrainteractive.astralibs.events.GlobalEventManager
 import com.astrainteractive.astrasync.api.AstraDatabase
-import com.astrainteractive.astrasync.api.Controller
-import com.astrainteractive.astrasync.events.BungeeUtil
+import com.astrainteractive.astrasync.api.messaging.BungeeMessage
+import com.astrainteractive.astrasync.api.messaging.BungeeMessageService
 import com.astrainteractive.astrasync.events.DiscordListener
 import com.astrainteractive.astrasync.events.EventController
 import com.astrainteractive.astrasync.events.EventHandler
 import com.astrainteractive.astrasync.utils.PluginTranslation
 import com.astrainteractive.astrasync.utils._EmpireConfig
 import com.astrainteractive.astrasync.utils._Files
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.bukkit.Bukkit
 import org.bukkit.event.HandlerList
@@ -36,7 +34,7 @@ class AstraSync : JavaPlugin() {
      * Class for handling all of your events
      */
     private lateinit var eventHandler: EventHandler
-    private var discordListener:DiscordListener?=null
+    private var discordListener: DiscordListener? = null
 
     /**
      * Command manager for your commands.
@@ -49,7 +47,7 @@ class AstraSync : JavaPlugin() {
         AstraDatabase()
     }
     private val bungeeChannelRegister by lazy {
-        Bukkit.getServer().messenger.registerOutgoingPluginChannel(AstraLibs.instance, "BungeeCord")
+        Bukkit.getServer().messenger.registerOutgoingPluginChannel(AstraLibs.instance, BungeeMessage.Messages.BUNGEE_CHANNEL.value)
     }
 
     /**
@@ -63,11 +61,15 @@ class AstraSync : JavaPlugin() {
         _EmpireConfig.kotlinxSerializaion()
         database.toString()
         bungeeChannelRegister
-        Bukkit.getServer().messenger.registerIncomingPluginChannel(AstraLibs.instance, "BungeeCord", BungeeUtil)
+        BungeeMessageService.remember()
         eventHandler = EventHandler()
         commandManager = CommandManager()
         Bukkit.getPluginManager().getPlugin("DiscordSRV")?.let {
-            discordListener = DiscordListener().apply { onEnable() }
+            println("Discord srv detected")
+            discordListener = DiscordListener().apply { this.onEnable(GlobalEventManager) }
+        }?:run{
+
+            println("Discord srv not detected")
         }
 
     }
@@ -79,7 +81,7 @@ class AstraSync : JavaPlugin() {
         runBlocking { EventController.saveAllPlayers() }
         HandlerList.unregisterAll(this)
         GlobalEventManager.onDisable()
-        Bukkit.getServer().messenger.unregisterIncomingPluginChannel(AstraLibs.instance, "BungeeCord", BungeeUtil)
+        BungeeMessageService.forget()
         discordListener?.onDisable()
     }
 

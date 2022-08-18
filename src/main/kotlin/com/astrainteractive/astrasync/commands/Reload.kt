@@ -1,14 +1,12 @@
 package com.astrainteractive.astrasync.commands
 
 import CommandManager
-import com.astrainteractive.astralibs.AstraLibs
 import com.astrainteractive.astralibs.commands.AstraDSLCommand
 import com.astrainteractive.astrasync.AstraSync
-import com.astrainteractive.astrasync.events.BungeeUtil
+import com.astrainteractive.astrasync.api.messaging.BungeeController
+import com.astrainteractive.astrasync.api.messaging.BungeeMessage
 import com.astrainteractive.astrasync.events.EventController
 import com.astrainteractive.astrasync.utils.Translation
-import com.google.common.io.ByteStreams
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 /**
@@ -39,7 +37,7 @@ fun CommandManager.syncServer() = AstraDSLCommand.command("syncserver") {
     }
 
     EventController.savePlayer(player) {
-        BungeeUtil.sendBungeeMessage( "BungeeCord", "Connect", server,player)
+        BungeeController.connectPlayerToServer(server, player)
     }
 }
 
