@@ -1,22 +1,17 @@
 package com.astrainteractive.astrasync
 
 import CommandManager
-import com.astrainteractive.astralibs.AstraLibs
-import com.astrainteractive.astralibs.Logger
-import com.astrainteractive.astralibs.events.GlobalEventManager
-import com.astrainteractive.astrasync.api.AstraDatabase
-import com.astrainteractive.astrasync.api.messaging.BungeeMessage
-import com.astrainteractive.astrasync.api.messaging.BungeeMessageService
-import com.astrainteractive.astrasync.events.DiscordListener
 import com.astrainteractive.astrasync.events.EventController
 import com.astrainteractive.astrasync.events.EventHandler
-import com.astrainteractive.astrasync.utils.PluginTranslation
-import com.astrainteractive.astrasync.utils._EmpireConfig
-import com.astrainteractive.astrasync.utils._Files
+import com.astrainteractive.astrasync.utils.Files
+import com.astrainteractive.astrasync.utils.providers.DatabaseModule
+import com.astrainteractive.astrasync.utils.providers.TranslationProvider
 import kotlinx.coroutines.runBlocking
-import org.bukkit.Bukkit
 import org.bukkit.event.HandlerList
 import org.bukkit.plugin.java.JavaPlugin
+import ru.astrainteractive.astralibs.AstraLibs
+import ru.astrainteractive.astralibs.Logger
+import ru.astrainteractive.astralibs.events.GlobalEventManager
 
 /**
  * Initial class for your plugin
@@ -34,7 +29,6 @@ class AstraSync : JavaPlugin() {
      * Class for handling all of your events
      */
     private lateinit var eventHandler: EventHandler
-    private var discordListener: DiscordListener? = null
 
     /**
      * Command manager for your commands.
@@ -43,12 +37,6 @@ class AstraSync : JavaPlugin() {
      */
     private lateinit var commandManager: CommandManager
 
-    private val database by lazy {
-        AstraDatabase()
-    }
-    private val bungeeChannelRegister by lazy {
-        Bukkit.getServer().messenger.registerOutgoingPluginChannel(AstraLibs.instance, BungeeMessage.Messages.BUNGEE_CHANNEL.value)
-    }
 
     /**
      * This method called when server starts or PlugMan load plugin.
@@ -56,22 +44,8 @@ class AstraSync : JavaPlugin() {
     override fun onEnable() {
         AstraLibs.rememberPlugin(this)
         Logger.prefix = "AstraSync"
-        PluginTranslation()
-        _Files()
-        _EmpireConfig.kotlinxSerializaion()
-        database.toString()
-        bungeeChannelRegister
-        BungeeMessageService.remember()
         eventHandler = EventHandler()
         commandManager = CommandManager()
-        Bukkit.getPluginManager().getPlugin("DiscordSRV")?.let {
-            println("Discord srv detected")
-            discordListener = DiscordListener().apply { this.onEnable(GlobalEventManager) }
-        }?:run{
-
-            println("Discord srv not detected")
-        }
-
     }
 
     /**
@@ -81,16 +55,15 @@ class AstraSync : JavaPlugin() {
         runBlocking { EventController.saveAllPlayers() }
         HandlerList.unregisterAll(this)
         GlobalEventManager.onDisable()
-        BungeeMessageService.forget()
-        discordListener?.onDisable()
     }
 
     /**
      * As it says, function for plugin reload
      */
     fun reloadPlugin() {
-        onDisable()
-        onEnable()
+        Files.configFile.reload()
+        TranslationProvider.reload()
+        DatabaseModule.value
     }
 
 }

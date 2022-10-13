@@ -1,13 +1,10 @@
 package com.astrainteractive.astrasync.commands
 
 import CommandManager
-import com.astrainteractive.astralibs.commands.AstraDSLCommand
 import com.astrainteractive.astrasync.AstraSync
-import com.astrainteractive.astrasync.api.messaging.BungeeController
-import com.astrainteractive.astrasync.api.messaging.BungeeMessage
-import com.astrainteractive.astrasync.events.EventController
-import com.astrainteractive.astrasync.utils.Translation
+import com.astrainteractive.astrasync.utils.providers.TranslationProvider
 import org.bukkit.entity.Player
+import ru.astrainteractive.astralibs.commands.AstraDSLCommand
 
 /**
  * Reload command handler
@@ -19,15 +16,15 @@ import org.bukkit.entity.Player
  * Here you should also check for permission
  */
 fun CommandManager.reload() = AstraDSLCommand.command("atempreload") {
-    sender.sendMessage(Translation.reload)
+    sender.sendMessage(TranslationProvider.value.reload)
     AstraSync.instance.reloadPlugin()
-    sender.sendMessage(Translation.reloadComplete)
+    sender.sendMessage(TranslationProvider.value.reloadComplete)
 }
 
 
 fun CommandManager.syncServer() = AstraDSLCommand.command("syncserver") {
-    sender.sendMessage(Translation.pleaseWait)
-    sender.sendMessage(Translation.inventoryLossWarning)
+    sender.sendMessage(TranslationProvider.value.pleaseWait)
+    sender.sendMessage(TranslationProvider.value.inventoryLossWarning)
     val player = sender as? Player
     player ?: run {
         return@command
@@ -35,10 +32,10 @@ fun CommandManager.syncServer() = AstraDSLCommand.command("syncserver") {
     val server = getArgumentOrNull(0) ?: run {
         return@command
     }
-
-    EventController.savePlayer(player) {
-        BungeeController.connectPlayerToServer(server, player)
-    }
+    //TODO
+//    EventController.savePlayer(player) {
+//        BungeeController.connectPlayerToServer(server, player)
+//    }
 }
 
 

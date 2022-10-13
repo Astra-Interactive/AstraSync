@@ -5,6 +5,7 @@ object Kotlin {
     const val kaml = "0.46.0"
     const val exposed = "0.39.2"
     const val mysqlDriver = "8.0.20"
+    const val astraLibs = "1.9.0"
 }
 
 object Spigot {
@@ -54,6 +55,14 @@ repositories {
     maven("https://repo1.maven.org/maven2/")
     maven("https://m2.dv8tion.net/releases")
     maven("https://maven.playpro.com")
+    maven {
+        url = uri("https://maven.pkg.github.com/Astra-Interactive/AstraLibs")
+        val config = project.getConfig()
+        credentials {
+            username = config.username
+            password = config.token
+        }
+    }
     maven("https://jitpack.io")
     maven {
         name = "papermc"
@@ -71,6 +80,9 @@ repositories {
 dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${Kotlin.version}")
+    implementation("ru.astrainteractive.astralibs:ktx-core:${Dependencies.Kotlin.astraLibs}")
+    implementation("ru.astrainteractive.astralibs:spigot-core:${Dependencies.Kotlin.astraLibs}")
+
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Kotlin.coroutines}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:${Kotlin.coroutines}")
@@ -83,8 +95,6 @@ dependencies {
     implementation("org.jetbrains.exposed", "exposed-dao", Kotlin.exposed)
     implementation("org.jetbrains.exposed", "exposed-jdbc", Kotlin.exposed)
     implementation("mysql:mysql-connector-java:${Kotlin.mysqlDriver}")
-    // AstraLibs
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     // Test
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.5.20")
     testImplementation("junit:junit:4.13.2")
@@ -105,8 +115,10 @@ dependencies {
     compileOnly("net.coreprotect:coreprotect:${Spigot.coreProtect}")
     compileOnly("com.ticxo.modelengine:api:${Spigot.modelEngine}")
 
+    implementation(Dependencies.Implementation.exposedCORD)
     compileOnly("com.velocitypowered:velocity-api:3.1.1")
     annotationProcessor("com.velocitypowered:velocity-api:3.1.1")
+    implementation(project(":domain"))
 //    implementation("org.xerial:sqlite-jdbc:3.23.1")
 }
 
@@ -174,7 +186,7 @@ tasks.shadowJar {
 
     doLast {
         copy {
-            from("D:\\Minecraft Servers\\FarmWorld\\main\\plugins"){
+            from("D:\\Minecraft Servers\\FarmWorld\\main\\plugins") {
                 exclude("DiscordSRV-Build-1.25.1.jar")
             }
             into("D:\\Minecraft Servers\\FarmWorld\\farm\\plugins")

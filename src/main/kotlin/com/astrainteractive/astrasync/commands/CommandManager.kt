@@ -1,4 +1,6 @@
-import com.astrainteractive.astrasync.commands.*
+import com.astrainteractive.astrasync.commands.reload
+import com.astrainteractive.astrasync.commands.syncServer
+import com.astrainteractive.astrasync.commands.tabCompleter
 
 
 /**

@@ -1,93 +1,53 @@
 package com.astrainteractive.astrasync.events
 
-import com.astrainteractive.astralibs.FileManager
-import com.astrainteractive.astralibs.async.AsyncHelper
-import com.astrainteractive.astralibs.utils.catching
-import com.astrainteractive.astrasync.api.Controller
-import com.astrainteractive.astrasync.api.Controller.databaseName
-import com.astrainteractive.astrasync.api.entities.DomainPlayer
-import com.astrainteractive.astrasync.utils.Translation
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
+import com.astrainteractive.astraclans.domain.datasource.SQLDataSource
+import com.astrainteractive.astraclans.domain.exception.DomainException
+import com.astrainteractive.astrasync.api.LocalPlayerDataSource
+import com.astrainteractive.astrasync.utils.Locker
+import com.astrainteractive.astrasync.utils.fromDTO
+import com.astrainteractive.astrasync.utils.toDTO
+import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import ru.astrainteractive.astralibs.async.PluginScope
+import ru.astrainteractive.astralibs.utils.uuid
 import java.util.*
 
+
 object EventController {
-    private val lockedPlayers = HashSet<UUID>()
+    val locker = Locker<UUID>()
+    private val sqlDataSource = SQLDataSource
+    private val localDataSource = LocalPlayerDataSource
 
-    @Synchronized
-    fun lockPlayer(player: Player) = lockedPlayers.add(player.uniqueId)
+    val writerDispatcher = Dispatchers.IO.limitedParallelism(1)
 
-    @Synchronized
-    fun unlockPlayer(player: Player) = lockedPlayers.remove(player.uniqueId)
-
-    @Synchronized
-    fun isPlayerLocked(player: Player?) = lockedPlayers.contains(player?.uniqueId)
-    fun loadPlayer(player: Player) = AsyncHelper.launch {
-        AsyncHelper.launch { savePlayerToTemp(player, false) }
-        if (isPlayerLocked(player)) return@launch
-        lockPlayer(player)
-        val playerDomain = Controller.getPlayerInfo(player) ?: run {
-            AsyncHelper.callSyncMethod {
-                player.kickPlayer(Translation.errorOccurredInLoading)
-                unlockPlayer(player)
-            }
-            return@launch
+    private inline fun <reified T> withLock(uuid: UUID, crossinline block: suspend CoroutineScope.() -> T) =
+        PluginScope.launch {
+            if (locker.isLocked(uuid)) throw DomainException.PlayerLockedException
+            locker.lock(uuid)
+            val result = block.invoke(this)
+            locker.unlock(uuid)
+            result
         }
-        AsyncHelper.callSyncMethod {
-            catching(true) { player.inventory.contents = playerDomain.items.toTypedArray() }
-            catching { player.totalExperience = playerDomain.experience }
-            catching { player.health = playerDomain.health }
-            catching { player.foodLevel = playerDomain.foodLevel }
-            catching(true) { player.enderChest.contents = playerDomain.enderChestItems.toTypedArray() }
-            catching(true) {
-                playerDomain.potionEffect.forEach {
-                    player.addPotionEffect(it)
-                }
-            }
-        }?.get()
-        unlockPlayer(player)
+
+    fun loadPlayer(player: Player) = withLock(player.uniqueId) {
+        localDataSource.savePlayer(player, LocalPlayerDataSource.TYPE.ENTER)
+        val playerDTO = sqlDataSource.select(player.uuid) ?: throw DomainException.PlayerDataNotExists
+        playerDTO.fromDTO()
     }
 
-    fun savePlayer(player: Player, clear: Boolean = false, onSaved: () -> Unit = {}) = AsyncHelper.launch {
-        AsyncHelper.launch { savePlayerToTemp(player,true) }
-        if (isPlayerLocked(player)) return@launch
-        lockPlayer(player)
-        Controller.saveFullPlayer(player, clear)?.let {
-            AsyncHelper.callSyncMethod(onSaved)
-        } ?: run {
-            player.sendMessage(Translation.errorOccurredInSaving)
+    fun savePlayer(player: Player, type: LocalPlayerDataSource.TYPE = LocalPlayerDataSource.TYPE.EXIT) =
+        withLock(player.uniqueId) {
+            localDataSource.savePlayer(player, type)
+            val playerDTO = player.toDTO()
+            sqlDataSource.update(playerDTO)
         }
-        unlockPlayer(player)
-    }
 
-    fun clearPlayer(player: Player) = AsyncHelper.launch {
-        if (isPlayerLocked(player)) return@launch
-        lockPlayer(player)
-        Controller.saveFullPlayer(player)
-        unlockPlayer(player)
-    }
-
-    fun saveAllPlayers() = AsyncHelper.launch {
+    fun saveAllPlayers() = PluginScope.launch {
         Bukkit.getOnlinePlayers().map {
             async {
-                savePlayer(it)
+                savePlayer(it, LocalPlayerDataSource.TYPE.SAVE_ALL)
             }
         }.awaitAll()
     }
-
-    fun savePlayerToTemp(player: Player, onLogin: Boolean) {
-        val prefix = if (onLogin) "login" else "exit"
-        val name = "temp/${player.databaseName}/${prefix}_${System.currentTimeMillis()}.yml"
-        val fileManager = FileManager(name)
-        val config = fileManager.getConfig()
-        DomainPlayer.fromPlayer(player).also {
-            config.set("player.items", it.items)
-            config.set("player.enderchest", it.enderChestItems)
-        }
-        fileManager.saveConfig()
-    }
-
 }
