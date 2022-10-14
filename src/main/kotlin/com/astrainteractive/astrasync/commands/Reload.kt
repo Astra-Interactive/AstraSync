@@ -2,6 +2,8 @@ package com.astrainteractive.astrasync.commands
 
 import CommandManager
 import com.astrainteractive.astrasync.AstraSync
+import com.astrainteractive.astrasync.api.messaging.BungeeController
+import com.astrainteractive.astrasync.events.EventController
 import com.astrainteractive.astrasync.utils.providers.TranslationProvider
 import org.bukkit.entity.Player
 import ru.astrainteractive.astralibs.commands.AstraDSLCommand
@@ -32,10 +34,9 @@ fun CommandManager.syncServer() = AstraDSLCommand.command("syncserver") {
     val server = getArgumentOrNull(0) ?: run {
         return@command
     }
-    //TODO
-//    EventController.savePlayer(player) {
-//        BungeeController.connectPlayerToServer(server, player)
-//    }
+    EventController.savePlayer(player).invokeOnCompletion {
+        BungeeController.connectPlayerToServer(server, player)
+    }
 }
 
 

@@ -3,7 +3,7 @@ package com.astrainteractive.astraclans.domain.dto.mapping
 import com.astrainteractive.astraclans.domain.dto.PlayerDTO
 import com.astrainteractive.astraclans.domain.entities.PlayerDAO
 
-interface IPlayerDTOMapper : Mapper<PlayerDAO, PlayerDTO>, ExposedMapper<PlayerDAO, PlayerDTO>
+interface IPlayerDTOMapper : IMapper<PlayerDAO, PlayerDTO>, ExposedMapper<PlayerDAO, PlayerDTO>
 object PlayerDTOMapper : IPlayerDTOMapper {
     override fun toDTO(it: PlayerDAO): PlayerDTO {
         return PlayerDTO(
@@ -16,6 +16,11 @@ object PlayerDTOMapper : IPlayerDTOMapper {
             enderChestItems = it.enderChestItems,
             effects = it.effects
         )
+    }
+
+    @Deprecated("Use toEsposed")
+    override fun fromDTO(it: PlayerDTO): PlayerDAO {
+        return PlayerDAO.new(toExposed(it))
     }
 
     override fun toExposed(it: PlayerDTO): PlayerDAO.() -> Unit  = {

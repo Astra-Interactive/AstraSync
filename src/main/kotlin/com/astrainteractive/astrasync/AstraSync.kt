@@ -1,6 +1,8 @@
 package com.astrainteractive.astrasync
 
 import CommandManager
+import com.astrainteractive.astrasync.api.messaging.BungeeController
+import com.astrainteractive.astrasync.api.messaging.models.BungeeMessage
 import com.astrainteractive.astrasync.events.EventController
 import com.astrainteractive.astrasync.events.EventHandler
 import com.astrainteractive.astrasync.utils.Files
@@ -25,18 +27,6 @@ class AstraSync : JavaPlugin() {
         instance = this
     }
 
-    /**
-     * Class for handling all of your events
-     */
-    private lateinit var eventHandler: EventHandler
-
-    /**
-     * Command manager for your commands.
-     *
-     * You can create multiple managers.
-     */
-    private lateinit var commandManager: CommandManager
-
 
     /**
      * This method called when server starts or PlugMan load plugin.
@@ -44,8 +34,11 @@ class AstraSync : JavaPlugin() {
     override fun onEnable() {
         AstraLibs.rememberPlugin(this)
         Logger.prefix = "AstraSync"
-        eventHandler = EventHandler()
-        commandManager = CommandManager()
+        reloadPlugin()
+        DatabaseModule.value
+        EventHandler()
+        CommandManager()
+        BungeeController.registerChannel(BungeeMessage.BUNGEE_CHANNEL)
     }
 
     /**
@@ -63,7 +56,6 @@ class AstraSync : JavaPlugin() {
     fun reloadPlugin() {
         Files.configFile.reload()
         TranslationProvider.reload()
-        DatabaseModule.value
     }
 
 }

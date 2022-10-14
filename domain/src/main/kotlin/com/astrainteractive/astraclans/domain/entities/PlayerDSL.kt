@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.Column
  * Игрок
  */
 object PlayerDSL : IntIdTable() {
-    val minecraftUUID: Column<String> = text("minecraft_name").uniqueIndex()
+    val minecraftUUID: Column<String> = varchar("minecraft_name",128).uniqueIndex()
     val experience: Column<Int> = integer("experience")
     val health: Column<Double> = double("health")
     val foodLevel: Column<Int> = integer("foodLevel")

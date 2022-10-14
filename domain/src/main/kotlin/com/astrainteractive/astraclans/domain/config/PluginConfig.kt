@@ -7,6 +7,7 @@ package com.astrainteractive.astraclans.domain.config
 @kotlinx.serialization.Serializable
 data class PluginConfig(
     val mysql: MySqlConfig,
+    val serverIDList: List<String>,
     val serverID: String,
 ) {
     @kotlinx.serialization.Serializable
