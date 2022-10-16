@@ -2,13 +2,13 @@ plugins {
     java
     `maven-publish`
     `java-library`
-    kotlin("jvm") version "1.7.0"
-    kotlin("plugin.serialization") version "1.7.0"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    kotlin("jvm") version Dependencies.Kotlin.version
+    kotlin("plugin.serialization") version Dependencies.Kotlin.version
+    id("com.github.johnrengelman.shadow") version Dependencies.Kotlin.shadow
 }
 
-group = "com.astrainteractive"
-version = "2.4.0"
+group = Dependencies.group
+version = Dependencies.version
 java {
     withSourcesJar()
     withJavadocJar()
@@ -18,56 +18,40 @@ java {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://papermc.io/repo/repository/maven-public/")
-    maven("https://nexus.scarsz.me/content/groups/public/")
-    maven("https://repo.dmulloy2.net/repository/public/")
-    maven("https://repo.essentialsx.net/snapshots/")
-    maven("https://repo.maven.apache.org/maven2/")
-    maven("https://repo.maven.apache.org/maven2/")
-    maven("https://maven.enginehub.org/repo/")
-    maven("https://repo1.maven.org/maven2/")
-    maven("https://m2.dv8tion.net/releases")
-    maven("https://maven.playpro.com")
-    maven {
-        url = uri("https://maven.pkg.github.com/Astra-Interactive/AstraLibs")
-        val config = project.getConfig()
-        credentials {
-            username = config.username
-            password = config.password
-        }
-    }
-    maven("https://jitpack.io")
-    maven {
-        name = "papermc"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-    }
-    maven {
-        url = uri("https://mvn.lumine.io/repository/maven-public/")
-        metadataSources {
-            artifact()
-        }
-    }
-    flatDir { dirs("libs") }
+    maven(Dependencies.Repositories.extendedclip)
+    maven(Dependencies.Repositories.maven2Apache)
+    maven(Dependencies.Repositories.essentialsx)
+    maven(Dependencies.Repositories.enginehub)
+    maven(Dependencies.Repositories.spigotmc)
+    maven(Dependencies.Repositories.dmulloy2)
+    maven(Dependencies.Repositories.papermc)
+    maven(Dependencies.Repositories.dv8tion)
+    maven(Dependencies.Repositories.playpro)
+    maven(Dependencies.Repositories.jitpack)
+    maven(Dependencies.Repositories.scarsz)
+    maven(Dependencies.Repositories.maven2)
+    modelEngige(project)
+    astraLibs(project)
+    paperMC(project)
 }
 
 dependencies {
-    implementation("ru.astrainteractive.astralibs:ktx-core:${Dependencies.Kotlin.astraLibs}")
-    implementation(Dependencies.Implementation.jdbc)
-    implementation(Dependencies.Implementation.exposedJavaTime)
-    implementation(Dependencies.Implementation.exposedJDBC)
-    implementation(Dependencies.Implementation.exposedCORD)
-    implementation(Dependencies.Implementation.exposedDAO)
-    // Serialization
-    implementation(Dependencies.Implementation.kotlinxSerialization)
-    implementation(Dependencies.Implementation.kotlinxSerializationJson)
-    implementation(Dependencies.Implementation.kotlinxSerializationYaml)
+    // Kotlin
+    implementation(Dependencies.Libraries.kotlinGradlePlugin)
     // AstraLibs
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-
+    implementation(Dependencies.Libraries.astraLibsKtxCore)
+    implementation(Dependencies.Libraries.jdbc)
+    implementation(Dependencies.Libraries.exposedJavaTime)
+    implementation(Dependencies.Libraries.exposedJDBC)
+    implementation(Dependencies.Libraries.exposedCORD)
+    implementation(Dependencies.Libraries.exposedDAO)
+    // Serialization
+    implementation(Dependencies.Libraries.kotlinxSerialization)
+    implementation(Dependencies.Libraries.kotlinxSerializationJson)
+    implementation(Dependencies.Libraries.kotlinxSerializationYaml)
+    // Test
     testImplementation(kotlin("test"))
-    testImplementation("org.testng:testng:7.1.0")
+    testImplementation(Dependencies.Libraries.orgTeting)
 
 }
 

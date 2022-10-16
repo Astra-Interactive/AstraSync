@@ -5,15 +5,15 @@ import kotlinx.coroutines.withContext
 
 class Locker<T>{
     private val set = HashSet<T>()
-    suspend fun lock(player: T) = withContext(EventController.writerDispatcher){
-        set.add(player)
+    suspend fun lock(obj: T) = withContext(EventController.writerDispatcher){
+        set.add(obj)
     }
 
-    suspend fun unlock(player: T) = withContext(EventController.writerDispatcher){
-        set.remove(player)
+    suspend fun unlock(obj: T) = withContext(EventController.writerDispatcher){
+        set.remove(obj)
     }
 
-    suspend fun isLocked(player: T?) = withContext(EventController.writerDispatcher){
-        set.contains(player)
+    suspend fun isLocked(obj: T?) = withContext(EventController.writerDispatcher){
+        set.contains(obj)
     }
 }
