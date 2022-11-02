@@ -1,25 +1,25 @@
 package com.astrainteractive.astrasync.events
 
-import com.astrainteractive.astraclans.domain.datasource.SQLDataSource
 import com.astrainteractive.astraclans.domain.exception.DomainException
-import com.astrainteractive.astrasync.api.LocalPlayerDataSource
+import com.astrainteractive.astrasync.api.ILocalPlayerDataSource
 import com.astrainteractive.astrasync.dto.BukkitPlayerMapper
+import com.astrainteractive.astrasync.modules.LocalDataSourceModule
+import com.astrainteractive.astrasync.modules.RemoteDataSourceModule
 import com.astrainteractive.astrasync.utils.Locker
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import ru.astrainteractive.astralibs.async.BukkitMain
 import ru.astrainteractive.astralibs.async.PluginScope
+import ru.astrainteractive.astralibs.di.getValue
 import ru.astrainteractive.astralibs.utils.uuid
 import java.util.*
 
 
 object EventController {
     val locker = Locker<UUID>()
-    private val sqlDataSource = SQLDataSource
-    private val localDataSource = LocalPlayerDataSource
-
-    val writerDispatcher = Dispatchers.IO.limitedParallelism(1)
+    private val sqlDataSource by RemoteDataSourceModule
+    private val localDataSource by LocalDataSourceModule
 
     private inline fun <reified T> withLock(uuid: UUID, crossinline block: suspend CoroutineScope.() -> T) =
         PluginScope.launch(Dispatchers.IO) {
@@ -31,12 +31,12 @@ object EventController {
         }
 
     fun loadPlayer(player: Player) = withLock(player.uniqueId) {
-        withContext(Dispatchers.IO) { localDataSource.savePlayer(player, LocalPlayerDataSource.TYPE.ENTER) }
+        withContext(Dispatchers.IO) { localDataSource.savePlayer(player, ILocalPlayerDataSource.TYPE.ENTER) }
         val playerDTO = sqlDataSource.select(player.uuid) ?: return@withLock
         withContext(Dispatchers.BukkitMain) { BukkitPlayerMapper.fromDTO(playerDTO) }
     }
 
-    fun savePlayer(player: Player, type: LocalPlayerDataSource.TYPE = LocalPlayerDataSource.TYPE.EXIT) =
+    fun savePlayer(player: Player, type: ILocalPlayerDataSource.TYPE = ILocalPlayerDataSource.TYPE.EXIT) =
         withLock(player.uniqueId) {
             localDataSource.savePlayer(player, type)
             val playerDTO = BukkitPlayerMapper.toDTO(player)
@@ -46,7 +46,7 @@ object EventController {
     fun saveAllPlayers() = PluginScope.launch {
         Bukkit.getOnlinePlayers().map {
             async {
-                savePlayer(it, LocalPlayerDataSource.TYPE.SAVE_ALL)
+                savePlayer(it, ILocalPlayerDataSource.TYPE.SAVE_ALL)
             }
         }.awaitAll()
     }

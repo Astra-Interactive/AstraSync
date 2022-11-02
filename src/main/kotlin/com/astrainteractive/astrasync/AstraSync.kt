@@ -5,9 +5,10 @@ import com.astrainteractive.astrasync.api.messaging.BungeeController
 import com.astrainteractive.astrasync.api.messaging.models.BungeeMessage
 import com.astrainteractive.astrasync.events.EventController
 import com.astrainteractive.astrasync.events.EventHandler
+import com.astrainteractive.astrasync.modules.ConfigProvider
+import com.astrainteractive.astrasync.modules.DatabaseModule
+import com.astrainteractive.astrasync.modules.TranslationProvider
 import com.astrainteractive.astrasync.utils.Files
-import com.astrainteractive.astrasync.utils.providers.DatabaseModule
-import com.astrainteractive.astrasync.utils.providers.TranslationProvider
 import kotlinx.coroutines.runBlocking
 import org.bukkit.event.HandlerList
 import org.bukkit.plugin.java.JavaPlugin
@@ -56,6 +57,7 @@ class AstraSync : JavaPlugin() {
     fun reloadPlugin() {
         Files.configFile.reload()
         TranslationProvider.reload()
+        ConfigProvider.reload()
     }
 
 }

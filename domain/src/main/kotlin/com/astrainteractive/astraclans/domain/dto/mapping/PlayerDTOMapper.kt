@@ -2,6 +2,7 @@ package com.astrainteractive.astraclans.domain.dto.mapping
 
 import com.astrainteractive.astraclans.domain.dto.PlayerDTO
 import com.astrainteractive.astraclans.domain.entities.PlayerDAO
+import ru.astrainteractive.astralibs.domain.mapping.IMapper
 
 interface IPlayerDTOMapper : IMapper<PlayerDAO, PlayerDTO>, ExposedMapper<PlayerDAO, PlayerDTO>
 object PlayerDTOMapper : IPlayerDTOMapper {

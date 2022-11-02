@@ -2,7 +2,7 @@ package com.astrainteractive.astrasync.commands
 
 
 import CommandManager
-import com.astrainteractive.astrasync.utils.providers.ConfigProvider
+import com.astrainteractive.astrasync.modules.ConfigProvider
 import ru.astrainteractive.astralibs.AstraLibs
 import ru.astrainteractive.astralibs.utils.registerTabCompleter
 import ru.astrainteractive.astralibs.utils.withEntry

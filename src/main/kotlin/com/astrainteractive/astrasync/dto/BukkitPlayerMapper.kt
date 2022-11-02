@@ -1,13 +1,13 @@
 package com.astrainteractive.astrasync.dto
 
 import com.astrainteractive.astraclans.domain.dto.PlayerDTO
-import com.astrainteractive.astraclans.domain.dto.mapping.IMapper
 import com.astrainteractive.astraclans.domain.exception.DomainException
 import com.astrainteractive.astrasync.utils.Serializer
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
+import ru.astrainteractive.astralibs.domain.mapping.IMapper
 import ru.astrainteractive.astralibs.utils.uuid
 import java.util.*
 

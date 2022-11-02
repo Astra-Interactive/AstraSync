@@ -1,6 +1,6 @@
 package com.astrainteractive.astrasync.events
 
-import com.astrainteractive.astrasync.api.LocalPlayerDataSource
+import com.astrainteractive.astrasync.api.ILocalPlayerDataSource
 import kotlinx.coroutines.runBlocking
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
@@ -72,7 +72,7 @@ class EventHandler {
         if (isPlayerLocked(e.player)) {
             e.isCancelled = true
             e.drops.clear()
-        } else EventController.savePlayer(e.player, LocalPlayerDataSource.TYPE.DEATH)
+        } else EventController.savePlayer(e.player, ILocalPlayerDataSource.TYPE.DEATH)
     }
 
 }

@@ -1,4 +1,4 @@
-package com.astrainteractive.astrasync.utils.providers
+package com.astrainteractive.astrasync.modules
 
 import com.astrainteractive.astraclans.domain.config.PluginConfig
 import com.astrainteractive.astraclans.domain.entities.PlayerDSL

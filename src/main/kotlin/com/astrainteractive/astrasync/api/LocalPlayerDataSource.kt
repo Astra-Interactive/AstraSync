@@ -3,12 +3,10 @@ package com.astrainteractive.astrasync.api
 import org.bukkit.entity.Player
 import ru.astrainteractive.astralibs.file_manager.FileManager
 
-object LocalPlayerDataSource {
-    enum class TYPE {
-        EXIT, ENTER, SAVE_ALL, DEATH
-    }
+class LocalPlayerDataSource : ILocalPlayerDataSource {
 
-    fun savePlayer(player: Player, type: TYPE) {
+
+    override fun savePlayer(player: Player, type: ILocalPlayerDataSource.TYPE) {
         val name = "temp/${player.name}/${type.name}_${System.currentTimeMillis()}.yml"
         val fileManager = FileManager(name)
         val config = fileManager.fileConfiguration
