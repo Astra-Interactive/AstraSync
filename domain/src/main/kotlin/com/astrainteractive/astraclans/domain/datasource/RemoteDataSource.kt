@@ -10,7 +10,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class RemoteDataSource : IRemoteDataSource {
     override fun update(playerDTO: PlayerDTO) = transaction {
-        (playerDTO.minecraftUUID)
+        val isExists = select(playerDTO.minecraftUUID) != null
+        if (isExists)
+            delete(playerDTO.minecraftUUID)
         insert(playerDTO)
     }
 

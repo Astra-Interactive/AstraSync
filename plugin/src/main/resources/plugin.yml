@@ -1,7 +1,7 @@
 main: com.astrainteractive.astrasync.AstraSync
 prefix: AstraSync
 description: '${description}'
-name: '${name}'
+name: AstraSync
 version: '${version}'
 authors: [ MakeevRoman ]
 author: MakeevRoman

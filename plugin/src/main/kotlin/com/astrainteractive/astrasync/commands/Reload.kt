@@ -2,7 +2,6 @@ package com.astrainteractive.astrasync.commands
 
 import CommandManager
 import com.astrainteractive.astrasync.AstraSync
-import com.astrainteractive.astrasync.api.messaging.BungeeController
 import com.astrainteractive.astrasync.events.EventController
 import com.astrainteractive.astrasync.modules.TranslationProvider
 import org.bukkit.entity.Player
@@ -27,7 +26,7 @@ fun CommandManager.reload() = AstraLibs.registerCommand("atempreload") { sender,
 }
 
 
-fun CommandManager.syncServer() = AstraLibs.registerCommand("syncserver") {sender, args ->
+fun CommandManager.syncServer() = AstraLibs.registerCommand("syncserver") { sender, args ->
     val translation by TranslationProvider
     sender.sendMessage(translation.pleaseWait)
     sender.sendMessage(translation.inventoryLossWarning)
@@ -40,9 +39,7 @@ fun CommandManager.syncServer() = AstraLibs.registerCommand("syncserver") {sende
         sender.sendMessage(translation.inputServerName)
         return@registerCommand
     }
-    EventController.savePlayer(player).invokeOnCompletion {
-        BungeeController.connectPlayerToServer(server, player)
-    }
+    EventController.changeServer(player, server)
 }
 
 

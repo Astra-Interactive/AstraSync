@@ -33,12 +33,14 @@ class EventHandler {
     }
 
     val onDamage = DSLEvent.event(EntityDamageEvent::class.java) { e ->
-        if (controller.isPlayerLocked(e.entity as? Player))
+        val player = e.entity as? Player ?: return@event
+        if (controller.isPlayerLocked(player))
             e.isCancelled = true
     }
 
     val inventoryOpenEvent = DSLEvent.event(InventoryOpenEvent::class.java) { e ->
-        if (controller.isPlayerLocked(e.player as? Player))
+        val player = e.player as? Player ?: return@event
+        if (controller.isPlayerLocked(player))
             e.isCancelled = true
     }
 
@@ -48,7 +50,8 @@ class EventHandler {
     }
 
     val pickUpItemEvent = DSLEvent.event(EntityPickupItemEvent::class.java) { e ->
-        if (controller.isPlayerLocked((e.entity as? Player)))
+        val player = e.entity as? Player ?: return@event
+        if (controller.isPlayerLocked(player))
             e.isCancelled = true
     }
 
@@ -68,7 +71,8 @@ class EventHandler {
     }
 
     val onInventoryClick = DSLEvent.event(InventoryClickEvent::class.java) { e ->
-        if (controller.isPlayerLocked(e.whoClicked as? Player))
+        val player = e.whoClicked as? Player ?: return@event
+        if (controller.isPlayerLocked(player))
             e.isCancelled = true
     }
 

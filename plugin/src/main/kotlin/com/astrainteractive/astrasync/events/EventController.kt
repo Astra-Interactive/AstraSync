@@ -2,6 +2,7 @@ package com.astrainteractive.astrasync.events
 
 import com.astrainteractive.astraclans.domain.exception.DomainException
 import com.astrainteractive.astrasync.api.ILocalPlayerDataSource
+import com.astrainteractive.astrasync.api.messaging.BungeeController
 import com.astrainteractive.astrasync.dto.BukkitPlayerMapper
 import com.astrainteractive.astrasync.modules.LocalDataSourceModule
 import com.astrainteractive.astrasync.modules.RemoteDataSourceModule
@@ -46,11 +47,19 @@ object EventController {
             sqlDataSource.update(playerDTO)
         }
 
-    fun saveAllPlayers() = PluginScope.launch {
+    fun saveAllPlayers() = PluginScope.launch(Dispatchers.IO) {
         Bukkit.getOnlinePlayers().map {
             async {
                 savePlayer(it, ILocalPlayerDataSource.TYPE.SAVE_ALL)
             }
         }.awaitAll()
     }
+
+    fun changeServer(player: Player, server: String) =
+        withLock(player.uniqueId) {
+            localDataSource.savePlayer(player, ILocalPlayerDataSource.TYPE.EXIT)
+            val playerDTO = BukkitPlayerMapper.toDTO(player)
+            sqlDataSource.update(playerDTO)
+            BungeeController.connectPlayerToServer(server, player)
+        }
 }
