@@ -13,7 +13,7 @@ import java.util.*
 
 interface IBukkitPlayerMapper : IMapper<Player, PlayerDTO>
 
-object BukkitPlayerMapper:IBukkitPlayerMapper{
+object BukkitPlayerMapper : IBukkitPlayerMapper {
     override fun toDTO(it: Player): PlayerDTO = PlayerDTO(
         minecraftUUID = it.uuid,
         totalExperience = it.totalExperience,
@@ -26,7 +26,8 @@ object BukkitPlayerMapper:IBukkitPlayerMapper{
     )
 
     override fun fromDTO(it: PlayerDTO): Player {
-        val player = Bukkit.getPlayer(UUID.fromString(it.minecraftUUID)) ?: throw DomainException.PlayerNotFoundException
+        val player =
+            Bukkit.getPlayer(UUID.fromString(it.minecraftUUID)) ?: throw DomainException.PlayerNotFoundException
         player.totalExperience = it.totalExperience
         player.health = it.health
         player.foodLevel = it.foodLevel
@@ -36,5 +37,4 @@ object BukkitPlayerMapper:IBukkitPlayerMapper{
         Serializer.decodeList<PotionEffect>(it.effects).map(player::addPotionEffect)
         return player
     }
-
 }

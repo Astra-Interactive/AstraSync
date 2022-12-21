@@ -1,4 +1,4 @@
-package com.astrainteractive.astrasync.utils
+package com.astrainteractive.astrasync.modules
 
 import ru.astrainteractive.astralibs.file_manager.FileManager
 

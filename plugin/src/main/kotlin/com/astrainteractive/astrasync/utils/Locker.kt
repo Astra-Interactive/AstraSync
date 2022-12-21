@@ -2,10 +2,11 @@ package com.astrainteractive.astrasync.utils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.concurrent.ConcurrentHashMap
 
 class Locker<T> {
     private val writerDispatcher = Dispatchers.IO.limitedParallelism(1)
-    private val set = HashSet<T>()
+    private val set: MutableSet<T> = ConcurrentHashMap.newKeySet<T>()
     suspend fun lock(obj: T) = withContext(writerDispatcher) {
         set.add(obj)
     }

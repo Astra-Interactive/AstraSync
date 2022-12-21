@@ -5,7 +5,7 @@ import com.astrainteractive.astrasync.api.ILocalPlayerDataSource
 import com.astrainteractive.astrasync.dto.BukkitPlayerMapper
 import com.astrainteractive.astrasync.modules.LocalDataSourceModule
 import com.astrainteractive.astrasync.modules.RemoteDataSourceModule
-import com.astrainteractive.astrasync.utils.Locker
+import com.astrainteractive.astrasync.modules.uuidLockerModule
 import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -17,9 +17,12 @@ import java.util.*
 
 
 object EventController {
-    val locker = Locker<UUID>()
+    private val locker by uuidLockerModule
     private val sqlDataSource by RemoteDataSourceModule
     private val localDataSource by LocalDataSourceModule
+    fun isPlayerLocked(player: Player?) = runBlocking {
+        locker.isLocked(player?.uniqueId)
+    }
 
     private inline fun <reified T> withLock(uuid: UUID, crossinline block: suspend CoroutineScope.() -> T) =
         PluginScope.launch(Dispatchers.IO) {

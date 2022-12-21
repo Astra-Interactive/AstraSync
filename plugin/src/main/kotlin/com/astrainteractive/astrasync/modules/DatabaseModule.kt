@@ -8,10 +8,10 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.vendors.MariaDBDialect
 import org.jetbrains.exposed.sql.vendors.MysqlDialect
 import ru.astrainteractive.astralibs.di.IModule
+import ru.astrainteractive.astralibs.di.getValue
 
 object DatabaseModule : IModule<Database>() {
-    private val config: PluginConfig
-        get() = ConfigProvider.value
+    private val config: PluginConfig by ConfigProvider
 
     private val host: String
         get() = config.mysql.host

@@ -18,6 +18,12 @@ dependencies {
     implementation(libs.astralibs.ktxCore)
     implementation(libs.astralibs.spigotCore)
     implementation(libs.bstats.bukkit)
+    // SQL
+    implementation(libs.xerialSqliteJdbcLib)
+    implementation(libs.exposed.java.time)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.dao)
     // Test
     testImplementation(kotlin("test"))
     testImplementation(libs.orgTesting)

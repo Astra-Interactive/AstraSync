@@ -1,6 +1,6 @@
 package com.astrainteractive.astraclans.domain.dto
 
-data class PlayerDTO(
+class PlayerDTO(
     val minecraftUUID: String,
     val totalExperience: Int,
     val health: Double,

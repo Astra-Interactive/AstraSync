@@ -39,5 +39,7 @@ class PluginTranslation : BaseTranslation() {
     val fromDiscordMessageFormat: String =
         translationValue("general.message_from_discord_format", "#0ecf41%player%: &7%message%")
 
+    val onlyPlayerCommand = translationValue("general.player_command", "#db2c18Эта команда только для игроков")
+    val inputServerName = translationValue("general.input_server", "#db2c18Введите название сервера, например: /syncserver SERVER_SMP")
 
 }
