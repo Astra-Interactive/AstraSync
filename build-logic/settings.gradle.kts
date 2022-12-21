@@ -1,6 +1,11 @@
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
+enableFeaturePreview("VERSION_CATALOGS")
+
 pluginManagement {
-    includeBuild("build-logic")
     repositories {
+        maven("https://maven.fabricmc.net/") { name = "Fabric" }
+        maven("https://files.minecraftforge.net/maven")
+        maven("https://dist.creeper.host/Sponge/maven")
         maven("https://plugins.gradle.org/m2/")
         maven("https://jitpack.io")
         gradlePluginPortal()
@@ -10,11 +15,19 @@ pluginManagement {
     }
 }
 
+buildscript {
+    repositories {
+        maven("https://files.minecraftforge.net/maven")
+        maven("https://dist.creeper.host/Sponge/maven")
+        maven("https://plugins.gradle.org/m2/")
+    }
+}
 dependencyResolutionManagement {
     repositories {
         gradlePluginPortal()
         mavenLocal()
         mavenCentral()
+        maven("https://mvn.lumine.io/repository/maven-public/") { metadataSources { artifact() } }
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://papermc.io/repo/repository/maven-public/")
@@ -28,9 +41,11 @@ dependencyResolutionManagement {
         maven("https://maven.playpro.com")
         maven("https://jitpack.io")
     }
+    versionCatalogs { create("libs") { from(files("../gradle/libs.versions.toml")) } }
+
 }
+rootProject.name = "build-logic"
 
-
-rootProject.name = "AstraSync"
-include("domain")
-include("plugin")
+include(
+    ":plugins:convention"
+)

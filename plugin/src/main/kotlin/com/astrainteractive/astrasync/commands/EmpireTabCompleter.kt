@@ -17,6 +17,3 @@ fun CommandManager.tabCompleter() = AstraLibs.registerTabCompleter("syncserver")
         return@registerTabCompleter serverList.serverIDList.withEntry(args.last())
     return@registerTabCompleter listOf<String>()
 }
-
-
-
