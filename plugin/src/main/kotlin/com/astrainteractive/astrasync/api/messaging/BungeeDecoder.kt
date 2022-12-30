@@ -22,7 +22,6 @@ object BungeeDecoder {
         return ByteStreams.newDataOutput().apply {
             action.split(" ").forEach(::writeUTF)
             message?.let(::writeUTF)
-            println("Sending: ${action.split(" ")} ${message ?: ""}")
         }
     }
 

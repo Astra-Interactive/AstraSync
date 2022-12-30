@@ -32,8 +32,6 @@ object DatabaseModule : IModule<Database>() {
             driver = driver,
             user = login, password = password
         )
-        println("jdbc:mysql://$host:$port/$name")
-        println("password: $password login: $login driver: $driver")
 
         Database.registerDialect("mariadb") { MariaDBDialect() }
         Database.registerDialect("mysql") { MysqlDialect() }
