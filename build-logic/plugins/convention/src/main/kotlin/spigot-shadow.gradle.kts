@@ -32,6 +32,6 @@ tasks.shadowJar {
     }
     archiveBaseName.set(libs.versions.name.get())
     destinationDirectory.set(File(libs.versions.destinationDirectoryPath.get()))
-    destinationDirectory.set(File("D:\\Minecraft Servers\\EmpireProjekt_remake\\farm\\plugins"))
+    destinationDirectory.set(File("D:\\Minecraft Servers\\EmpireProjekt_remake\\smp\\plugins"))
 
 }

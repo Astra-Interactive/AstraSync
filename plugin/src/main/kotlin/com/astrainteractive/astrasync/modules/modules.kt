@@ -3,6 +3,7 @@ package com.astrainteractive.astrasync.modules
 import com.astrainteractive.astraclans.domain.config.PluginConfig
 import com.astrainteractive.astraclans.domain.datasource.RemoteDataSource
 import com.astrainteractive.astrasync.api.LocalPlayerDataSource
+import com.astrainteractive.astrasync.api.SpigotLocalPlayerDataSource
 import com.astrainteractive.astrasync.utils.Locker
 import com.astrainteractive.astrasync.utils.PluginTranslation
 import ru.astrainteractive.astralibs.EmpireSerializer
@@ -12,7 +13,7 @@ import ru.astrainteractive.astralibs.di.reloadable
 import java.util.*
 
 val ConfigProvider = reloadable {
-    EmpireSerializer.toClass< PluginConfig>(Files.configFile)!!
+    EmpireSerializer.toClass<PluginConfig>(Files.configFile)!!
 }
 val TranslationProvider = reloadable {
     PluginTranslation()
@@ -22,7 +23,7 @@ val RemoteDataSourceModule = module {
     RemoteDataSource()
 }
 val LocalDataSourceModule = module {
-    LocalPlayerDataSource()
+    LocalPlayerDataSource() as SpigotLocalPlayerDataSource
 }
 val uuidLockerModule = module {
     Locker<UUID>()

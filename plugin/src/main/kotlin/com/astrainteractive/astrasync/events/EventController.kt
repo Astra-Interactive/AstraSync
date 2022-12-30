@@ -1,7 +1,7 @@
 package com.astrainteractive.astrasync.events
 
+import com.astrainteractive.astraclans.domain.datasource.ILocalPlayerDataSource
 import com.astrainteractive.astraclans.domain.exception.DomainException
-import com.astrainteractive.astrasync.api.ILocalPlayerDataSource
 import com.astrainteractive.astrasync.api.messaging.BungeeController
 import com.astrainteractive.astrasync.dto.BukkitPlayerMapper
 import com.astrainteractive.astrasync.modules.LocalDataSourceModule

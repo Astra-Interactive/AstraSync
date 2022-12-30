@@ -11,5 +11,6 @@ softdepend: [ ]
 depend: [ ]
 loadbefore: [ ]
 commands:
+  history:
   reload:
   syncserver:

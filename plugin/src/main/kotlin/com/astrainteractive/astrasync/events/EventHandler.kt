@@ -1,6 +1,6 @@
 package com.astrainteractive.astrasync.events
 
-import com.astrainteractive.astrasync.api.ILocalPlayerDataSource
+import com.astrainteractive.astraclans.domain.datasource.ILocalPlayerDataSource
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
